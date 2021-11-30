@@ -20,7 +20,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/auth_button"
+        android:id="@+id/login_button"
         android:layout_width="379dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

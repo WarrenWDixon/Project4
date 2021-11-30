@@ -36,15 +36,17 @@
             android:value="@string/google_maps_key" />
 
         <activity android:name="com.udacity.warrenp4.authentication.AuthenticationActivity">
-        </activity>
-        <activity android:name="com.udacity.warrenp4.locationreminders.RemindersActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name="com.udacity.warrenp4.locationreminders.RemindersActivity" >
+
 
         </activity>
+
         <receiver
             android:name="com.udacity.warrenp4.locationreminders.geofence.GeofenceBroadcastReceiver"
             android:enabled="true"
