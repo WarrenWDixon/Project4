@@ -13,7 +13,8 @@ class AuthenticationActivity : AppCompatActivity() {
         const val TAG = "LoginFragment"
         const val SIGN_IN_RESULT_CODE = 1001
     }
-    //wwd
+    //wwd  2
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_authentication)
