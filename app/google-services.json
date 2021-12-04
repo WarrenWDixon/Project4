@@ -1,41 +1,41 @@
 {
   "project_info": {
-    "project_number": "845027085955",
-    "project_id": "myreminderapp-333602",
-    "storage_bucket": "myreminderapp-333602.appspot.com"
+    "project_number": "666850049421",
+    "project_id": "warrendproject4",
+    "storage_bucket": "warrendproject4.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:845027085955:android:95849bf7e0b6787b3e55b6",
+        "mobilesdk_app_id": "1:666850049421:android:30f1806b5a6758c830d1c4",
         "android_client_info": {
-          "package_name": "com.udacity.warrenp4"
+          "package_name": "com.udacity.warrendproject4"
         }
       },
       "oauth_client": [
         {
-          "client_id": "845027085955-es4ll6h7n9avisj5njd8t47g0vur1t8j.apps.googleusercontent.com",
+          "client_id": "666850049421-pg9tqhdftfcvd6lc9dglv09ouj0sv8gt.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.udacity.warrenp4",
+            "package_name": "com.udacity.warrendproject4",
             "certificate_hash": "0cc90d81bfde278e23dbb7bd4a7e4737fd5d668b"
           }
         },
         {
-          "client_id": "845027085955-uuecahf5acqrh9scqql73f5ll2haoltd.apps.googleusercontent.com",
+          "client_id": "666850049421-dr4ff64bdka39ms60rna5iv9j10og7c6.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDYZFXS_3UDgeb-7OKrXZi6MsY5OAkr8eM"
+          "current_key": "AIzaSyCxT2S_-9HzqOdBDF91vrD4A_ZTwe8F9dE"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "845027085955-uuecahf5acqrh9scqql73f5ll2haoltd.apps.googleusercontent.com",
+              "client_id": "666850049421-dr4ff64bdka39ms60rna5iv9j10og7c6.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
