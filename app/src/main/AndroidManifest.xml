@@ -44,9 +44,7 @@
         </activity>
         <activity android:name="com.udacity.warrendproject4.locationreminders.RemindersActivity" >
 
-
         </activity>
-
         <receiver
             android:name="com.udacity.warrendproject4.locationreminders.geofence.GeofenceBroadcastReceiver"
             android:enabled="true"

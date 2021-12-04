@@ -66,14 +66,14 @@ class AuthenticationActivity : AppCompatActivity() {
                 Log.i(
                     "WWD", "Successfully signed in user " +
                             "${FirebaseAuth.getInstance().currentUser?.displayName}!")
-                //val intent = Intent(this, RemindersActivity::class.java)
-                //startActivity(intent)
+                val intent = Intent(this, RemindersActivity::class.java)
+                startActivity(intent)
 
             } else {
                 // Sign in failed. If response is null the user canceled the sign-in flow using
                 // the back button. Otherwise check response.getError().getErrorCode() and handle
                 // the error.
-                    Log.d("WWD", "login failed")
+                Log.d("WWD", "login failed")
                 Log.i(TAG, "Sign in unsuccessful ${response?.error?.errorCode}")
             }
         }
