@@ -65,7 +65,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
 
 //        TODO: call this function after the user confirms on the selected location
-        //onLocationSelected()
+        onLocationSelected()
 
         return binding.root
     }
@@ -114,6 +114,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         //setMapStyle(map)
         Log.d("WWD", "in on MapReady before enableMyLocation")
         //enableMyLocation()
+        isPermissionGranted()
     }
 
     private fun setMapLongClick(map:GoogleMap) {
@@ -171,9 +172,9 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     }
 
     private fun isPermissionGranted() : Boolean {
-        android.util.Log.d("WWD", "isPermissionGranted")
+        Log.d("WWD", "isPermissionGranted")
         val flag = ContextCompat.checkSelfPermission(
-           getApplicationContext(),
+           requireActivity(),
             Manifest.permission.ACCESS_FINE_LOCATION)
         Log.d("WWD", " after checkSelfPermission flag is " + flag)
         return (flag === PackageManager.PERMISSION_GRANTED)
