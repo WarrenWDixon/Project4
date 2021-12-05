@@ -19,17 +19,23 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.*
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.content.res.Resources
+import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import com.google.android.gms.auth.api.signin.GoogleSignIn.requestPermissions
+import com.google.android.gms.common.api.ResolvableApiException
 
 
 import java.util.*
@@ -115,7 +121,9 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         //setMapStyle(map)
         Log.d("WWD", "in on MapReady before enableMyLocation")
         enableMyLocation()
+        Log.d("WWD", "now call check DeviceLocation")
         //isPermissionGranted()
+        checkDeviceLocationSettingsAndStartGeofence(true)
     }
 
     private fun setMapLongClick(map:GoogleMap) {
@@ -159,7 +167,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             // in a raw resource file.
             val success = map.setMapStyle(
                 MapStyleOptions.loadRawResourceStyle(
-                    getApplicationContext(),
+                    requireActivity(),
                     R.raw.map_style
                 )
             )
@@ -183,96 +191,93 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
     @SuppressLint("MissingPermission")
     private fun enableMyLocation() {
+        Log.d("WWD", "in enableMyLocation")
         if (isPermissionGranted()) {
+            Log.d("WWD", "permission granted")
             map.setMyLocationEnabled(true)
         }
         else {
-            ActivityCompat.requestPermissions(
+            Log.d("WWD", "request permission")
+            /*requestPermissions(
                 requireActivity(),
                 arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
                 REQUEST_LOCATION_PERMISSION
-            )
+            ) */
         }
     }
-
-      /*private fun enableMyLocation() {
-        android.util.Log.d("WWD", "in enableMyLocation")
-        var myFlag = isPermissionGranted()
-        Log.d("WWD", "return of isPermissionGranted is " + myFlag);
-        //if (isPermissionGranted()) {
-        if (myFlag) {
-            Log.d("WWD", "isPermissionsGranted true block")
-            if (ContextCompat.checkSelfPermission(
-                    getApplicationContext(),
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                    getApplicationContext(),
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                    android.util.Log.d("WWD", "in checkSelfPermissions block")
-                ContextCompat.requestPermissions(
-                    getActivity(),
-                    arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
-                    REQUEST_LOCATION_PERMISSION)
-                return
-            }
-            Log.d("WWD", "call map.setMyLocationEnabled")
-            map.setMyLocationEnabled(true)
-        }
-        else {
-            Log.d("WWD", "isPermissionsGranted false block")
-            ActivityCompat.requestPermissions(
-                getApplicationContext(),
-                arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
-                REQUEST_LOCATION_PERMISSION)
-        }
-        Log.d("WWD", "end of enableMyLocation")
-    } */
-
-    /* private fun enableMyLocation() {
-        if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-            ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
-        ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            // public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            ActivityCompat.requestPermissions(
-                getApplicationContext(),
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
-                REQUEST_LOCATION_PERMISSION
-            )
-        } else {
-            map.isMyLocationEnabled = true
-        }
-    } */
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
         grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        Log.d("WWD", "onRequestPermissionsResult")
+        Log.d("WWD", "in onRequestPermissionsResult")
         // Check if location permissions are granted and if so enable the
         // location data layer.
         if (requestCode == REQUEST_LOCATION_PERMISSION) {
-            Log.d("WWD", "requset code match")
-           /* if (grantResults.size > 0 && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                android.util.Log.d("WWD", "onRequestPermissionsResult permission granted")
-                //enableMyLocation()
-            } */
+            if (grantResults.size > 0 && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                enableMyLocation()
+            }
         }
     }
 
+    private fun checkDeviceLocationSettingsAndStartGeofence(resolve:Boolean = true) {
+        val locationRequest = LocationRequest.create().apply {
+            priority = LocationRequest.PRIORITY_LOW_POWER
+        }
+        Log.d("WWD", "in checkDeviceLocation")
+        val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
+        val settingsClient = LocationServices.getSettingsClient(requireActivity())
+        val locationSettingsResponseTask =
+            settingsClient.checkLocationSettings(builder.build())
+        Log.d("WWD", "in checkDeviceLocation built now set Listener")
+        locationSettingsResponseTask.addOnFailureListener { exception ->
+            Log.d("WWD", "in checkDeviceLocation in Failure Listener")
+            if (exception is ResolvableApiException && resolve){
+                try {
+                    exception.startResolutionForResult(requireActivity(),
+                        REQUEST_TURN_DEVICE_LOCATION_ON)
+                } catch (sendEx: IntentSender.SendIntentException) {
+                    Log.d("WWD", "Error getting location settings resolution: " + sendEx.message)
+                }
+            } else {
+               Log.d("WWD", "location failed")
+            }
+        }
+        Log.d("WWD", "in checkDeviceLocation set on complete listener")
+        locationSettingsResponseTask.addOnCompleteListener {
+            Log.d("WWD", "in checkDeviceLocation in on complete listener")
+            if ( it.isSuccessful ) {
+                Log.d("WWD", "location worked" + it.result)
+            }
+        }
+    }
+
+    // tutorial code
+    /* private lateinit var locationManager: LocationManager
+    private val locationPermissionCode = 2
+    private fun getLocation() {
+        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), locationPermissionCode)
+        }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5f, this)
+    }
+
+    override fun onLocationChanged(location: Location) {
+        Log.d("WWD", "Latitude: " + location.latitude + " , Longitude: " + location.longitude)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        if (requestCode == locationPermissionCode) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(requireActivity(), "Permission Granted", Toast.LENGTH_SHORT).show()
+            }
+            else {
+                Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show()
+            }
+        }
+    } */
 
 }
+private const val REQUEST_TURN_DEVICE_LOCATION_ON = 29
