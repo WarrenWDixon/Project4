@@ -18,6 +18,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.*
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import androidx.appcompat.app.AppCompatActivity
@@ -113,8 +114,8 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         Log.d("WWD", "in on MapReady before setMapStyle")
         //setMapStyle(map)
         Log.d("WWD", "in on MapReady before enableMyLocation")
-        //enableMyLocation()
-        isPermissionGranted()
+        enableMyLocation()
+        //isPermissionGranted()
     }
 
     private fun setMapLongClick(map:GoogleMap) {
@@ -180,7 +181,21 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         return (flag === PackageManager.PERMISSION_GRANTED)
     }
 
-    /* private fun enableMyLocation() {
+    @SuppressLint("MissingPermission")
+    private fun enableMyLocation() {
+        if (isPermissionGranted()) {
+            map.setMyLocationEnabled(true)
+        }
+        else {
+            ActivityCompat.requestPermissions(
+                requireActivity(),
+                arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
+                REQUEST_LOCATION_PERMISSION
+            )
+        }
+    }
+
+      /*private fun enableMyLocation() {
         android.util.Log.d("WWD", "in enableMyLocation")
         var myFlag = isPermissionGranted()
         Log.d("WWD", "return of isPermissionGranted is " + myFlag);
