@@ -115,6 +115,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         Log.d("WWD", "in on MapReady before enableMyLocation")
         enableMyLocation()
         Log.d("WWD", "now call check DeviceLocation")
+        setMapLongClick(map)
     }
     private fun isPermissionGranted() : Boolean {
         return ContextCompat.checkSelfPermission(
@@ -153,19 +154,20 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     private fun setMapLongClick(map:GoogleMap) {
         map.setOnMapLongClickListener { latLng ->
             // A Snippet is Additional text that's displayed below the title.
+            Log.d("WWD", "in long click lat: " + latLng.latitude + "   long: " + latLng.longitude)
             val snippet = String.format(
                 Locale.getDefault(),
                 "Lat: %1$.5f, Long: %2$.5f",
                 latLng.latitude,
                 latLng.longitude
             )
-            Log.d("WWD", "calling add Marker")
+            Log.d("WWD", "calling add Marker " + snippet)
             map.addMarker(
                 MarkerOptions()
                     .position(latLng)
                     .title(getString(R.string.dropped_pin))
                     .snippet(snippet)
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                    //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
 
             )
 

@@ -3,6 +3,7 @@ package com.udacity.warrendproject4.locationreminders.savereminder
 import android.content.Context
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,6 +33,7 @@ class SaveReminderFragment : BaseFragment() {
 
         binding.viewModel = _viewModel
         binding.reminderDescription.onFocusChangeListener = View.OnFocusChangeListener { p0, p1->
+                Log.d("WWD", "in OnFocusChangeListener p0: " + p0 + "  p1: " + p1)
                hideKeyboard()
         }
         return binding.root
@@ -39,8 +41,12 @@ class SaveReminderFragment : BaseFragment() {
 
     private fun hideKeyboard() {
         val inputManager = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        Log.d("WWD", "in hideKeyboard")
         if (inputManager.isAcceptingText) {
+            Log.d("WWD", "in isAcceptingText, call hideSoftInput")
             inputManager.hideSoftInputFromWindow(activity?.currentFocus?.windowToken, 0)
+        } else {
+            Log.d("WWD", "isAccepting Text else block")
         }
     }
 
