@@ -1,9 +1,13 @@
 package com.udacity.warrendproject4.locationreminders.savereminder
 
+import android.content.Context
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.databinding.DataBindingUtil
 import com.udacity.warrendproject4.R
 import com.udacity.warrendproject4.base.BaseFragment
@@ -27,8 +31,17 @@ class SaveReminderFragment : BaseFragment() {
         setDisplayHomeAsUpEnabled(true)
 
         binding.viewModel = _viewModel
-
+        binding.reminderDescription.onFocusChangeListener = View.OnFocusChangeListener { p0, p1->
+               hideKeyboard()
+        }
         return binding.root
+    }
+
+    private fun hideKeyboard() {
+        val inputManager = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        if (inputManager.isAcceptingText) {
+            inputManager.hideSoftInputFromWindow(activity?.currentFocus?.windowToken, 0)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

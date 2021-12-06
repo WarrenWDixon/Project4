@@ -58,6 +58,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         binding.lifecycleOwner = this
         Log.d("WWD", "in SelectLocationFragment")
 
+
         setHasOptionsMenu(true)
         setDisplayHomeAsUpEnabled(true)
 
@@ -109,18 +110,11 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         Log.d("WWD", "in on MapReady")
         map = googleMap
-        val home = LatLng(33.134059572767, -96.78572221255695)
-        // Add a marker in Sydney and move the camera
         val zoomLevel = 15f
-        map.addMarker(MarkerOptions().position(home).title("Marker at Home"))
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(home, zoomLevel))
         Log.d("WWD", "in on MapReady before setMapLongClick")
-       // setMapLongClick(map)
-        //setPoiClick(map)
         Log.d("WWD", "in on MapReady before enableMyLocation")
         enableMyLocation()
         Log.d("WWD", "now call check DeviceLocation")
-        //isPermissionGranted()
     }
     private fun isPermissionGranted() : Boolean {
         return ContextCompat.checkSelfPermission(
@@ -178,17 +172,5 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         }
     }
 
-    private fun setPoiClick(map: GoogleMap) {
-        map.setOnPoiClickListener { poi ->
-            val poiMarker = map.addMarker(
-                MarkerOptions()
-                    .position(poi.latLng)
-                    .title(poi.name)
-            )
-            if (poiMarker != null) {
-                poiMarker.showInfoWindow()
-            }
-        }
-    }
 
 }

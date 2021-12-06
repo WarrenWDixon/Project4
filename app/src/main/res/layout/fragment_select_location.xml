@@ -10,9 +10,11 @@
             type="com.udacity.warrendproject4.locationreminders.savereminder.SaveReminderViewModel" />
     </data>
 
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <!--TODO: Add the map fragment for the user to select the location-->
         <fragment xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:map="http://schemas.android.com/apk/res-auto"
@@ -21,7 +23,19 @@
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context=".MapsActivity" />
+            tools:context=".MapsActivity">
 
+            <Button
+                android:id="@+id/location_save_btn"
+                android:backgroundTint="@color/colorAccent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginTop="20dp"
+                android:padding="10dp"
+                android:paddingRight="10dp"
+                android:text="SAVE" />
+
+        </fragment>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
