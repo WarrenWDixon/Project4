@@ -36,6 +36,7 @@ import androidx.core.content.ContextCompat.getSystemService
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import com.google.android.gms.auth.api.signin.GoogleSignIn.requestPermissions
 import com.google.android.gms.common.api.ResolvableApiException
+import kotlinx.coroutines.selects.select
 import java.lang.Exception
 
 
@@ -48,6 +49,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     private lateinit var binding: FragmentSelectLocationBinding
     private val REQUEST_LOCATION_PERMISSION = 1
     private lateinit var fusedLocationProvider: FusedLocationProviderClient
+    private lateinit var selectedLocation : LatLng
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -86,6 +88,22 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         //         send back the selected location details to the view model
         //         and navigate back to the previous fragment to save the reminder and add the geofence
     }
+
+    private fun setPoiClick(map: GoogleMap) {
+        map.setOnPoiClickListener { poi ->
+            selectedLocation = poi.latLng
+            map.clear()
+            val poiMarker = map.addMarker(
+                MarkerOptions()
+                    .position(poi.latLng)
+                    .title(poi.name)
+            )
+            if (poiMarker != null) {
+                poiMarker.showInfoWindow()
+            }
+        }
+    }
+
 
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -177,6 +195,8 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
     private fun setMapLongClick(map:GoogleMap) {
         map.setOnMapLongClickListener { latLng ->
+            map.clear()
+            selectedLocation = latLng
             // A Snippet is Additional text that's displayed below the title.
             Log.d("WWD", "in long click lat: " + latLng.latitude + "   long: " + latLng.longitude)
             val snippet = String.format(
@@ -186,15 +206,11 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                 latLng.longitude
             )
             Log.d("WWD", "calling add Marker " + snippet)
-            map.addMarker(
-                MarkerOptions()
+            val marker = map.addMarker(MarkerOptions()
                     .position(latLng)
-                    .title(getString(R.string.dropped_pin))
-                    .snippet(snippet)
-                    //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-
-            )
-
+                    .title(getString(R.string.reminder_location))
+                    .snippet(snippet))
+            marker?.showInfoWindow()
         }
     }
 
