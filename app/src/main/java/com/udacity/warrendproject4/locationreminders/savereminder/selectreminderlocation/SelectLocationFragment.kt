@@ -36,7 +36,7 @@ import androidx.core.content.ContextCompat.getSystemService
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import com.google.android.gms.auth.api.signin.GoogleSignIn.requestPermissions
 import com.google.android.gms.common.api.ResolvableApiException
-
+import java.lang.Exception
 
 
 import java.util.*
@@ -47,6 +47,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     override val _viewModel: SaveReminderViewModel by inject()
     private lateinit var binding: FragmentSelectLocationBinding
     private val REQUEST_LOCATION_PERMISSION = 1
+    private lateinit var fusedLocationProvider: FusedLocationProviderClient
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -70,6 +71,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         val mapFragment = childFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         Log.d("WWD", "call getMapAsync")
+        fusedLocationProvider = FusedLocationProviderClient(context!!)
         mapFragment.getMapAsync(this)
 
 
@@ -127,6 +129,28 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     private fun enableMyLocation() {
         if (isPermissionGranted()) {
             map.setMyLocationEnabled(true)
+            try {
+                val locationResult = fusedLocationProvider.lastLocation
+                locationResult.addOnCompleteListener(requireActivity()) {
+                    if (it.isSuccessful) {
+                        // Set the map's camera position to the current location of the device.
+                        var zoomLocation = it.result
+                        var zoomLocationLatLong = LatLng(zoomLocation!!.latitude, zoomLocation.longitude)
+                        // making/creating a marker at where the user is
+                        map.moveCamera(CameraUpdateFactory.newLatLngZoom(zoomLocationLatLong, 15f)) // zooming into their location
+                        val marker = map.addMarker(
+                            MarkerOptions()
+                                .position(zoomLocationLatLong)
+                                .title("You Are Here")
+                        )
+                        marker?.showInfoWindow()
+                    }
+                }
+            }
+            catch (e: Exception){
+                Log.e("WWD", e.message.toString())
+            }
+
         }
         else {
             ActivityCompat.requestPermissions(
