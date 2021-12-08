@@ -28,6 +28,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Button
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.requestPermissions
@@ -36,6 +37,8 @@ import androidx.core.content.ContextCompat.getSystemService
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import com.google.android.gms.auth.api.signin.GoogleSignIn.requestPermissions
 import com.google.android.gms.common.api.ResolvableApiException
+import com.udacity.warrendproject4.base.NavigationCommand
+import com.udacity.warrendproject4.locationreminders.savereminder.SaveReminderFragmentDirections
 import kotlinx.coroutines.selects.select
 import java.lang.Exception
 
@@ -50,6 +53,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     private val REQUEST_LOCATION_PERMISSION = 1
     private lateinit var fusedLocationProvider: FusedLocationProviderClient
     private lateinit var selectedLocation : LatLng
+    private lateinit var saveButton: Button
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -60,6 +64,10 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         binding.viewModel = _viewModel
         binding.lifecycleOwner = this
         Log.d("WWD", "in SelectLocationFragment")
+        binding.locationSaveBtn.setOnClickListener {
+            Log.d("WWD", "in save on click listener")
+            _viewModel.navigationCommand.value  = NavigationCommand.Back
+        }
 
 
         setHasOptionsMenu(true)
