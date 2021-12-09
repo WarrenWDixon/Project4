@@ -55,6 +55,10 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     private lateinit var selectedLocation : LatLng
     private lateinit var saveButton: Button
 
+    companion object {
+        private lateinit var selectedLocation : LatLng
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
@@ -109,6 +113,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             if (poiMarker != null) {
                 poiMarker.showInfoWindow()
             }
+            _viewModel.reminderSelectedLocationStr.value = poi.name
         }
     }
 
@@ -205,6 +210,11 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         map.setOnMapLongClickListener { latLng ->
             map.clear()
             selectedLocation = latLng
+            _viewModel.latitude.value = latLng.latitude
+            _viewModel.longitude.value = latLng.longitude
+            _viewModel.reminderSelectedLocationStr.value = "Selected Location"
+
+
             // A Snippet is Additional text that's displayed below the title.
             Log.d("WWD", "in long click lat: " + latLng.latitude + "   long: " + latLng.longitude)
             val snippet = String.format(

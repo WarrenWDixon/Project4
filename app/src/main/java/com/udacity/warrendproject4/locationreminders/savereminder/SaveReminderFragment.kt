@@ -14,6 +14,7 @@ import com.udacity.warrendproject4.R
 import com.udacity.warrendproject4.base.BaseFragment
 import com.udacity.warrendproject4.base.NavigationCommand
 import com.udacity.warrendproject4.databinding.FragmentSaveReminderBinding
+import com.udacity.warrendproject4.locationreminders.reminderslist.ReminderDataItem
 import com.udacity.warrendproject4.utils.setDisplayHomeAsUpEnabled
 import org.koin.android.ext.android.inject
 
@@ -30,6 +31,7 @@ class SaveReminderFragment : BaseFragment() {
             DataBindingUtil.inflate(inflater, R.layout.fragment_save_reminder, container, false)
 
         setDisplayHomeAsUpEnabled(true)
+        Log.d("WWD", "in SaveReminderFragment onCreateView")
 
         binding.viewModel = _viewModel
         binding.reminderDescription.onFocusChangeListener = View.OnFocusChangeListener { p0, p1->
@@ -53,19 +55,30 @@ class SaveReminderFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = this
+        Log.d("WWD", "in SaveReminderFragment onViewCreated")
         binding.selectLocation.setOnClickListener {
             //            Navigate to another fragment to get the user location
             _viewModel.navigationCommand.value =
                 NavigationCommand.To(SaveReminderFragmentDirections.actionSaveReminderFragmentToSelectLocationFragment())
         }
+        Log.d("WWD", "set on click listener for save reminder")
 
         binding.saveReminder.setOnClickListener {
+            Log.d("WWD", " in setOnClickListener")
             val title = _viewModel.reminderTitle.value
-            val description = _viewModel.reminderDescription
+            val description = _viewModel.reminderDescription.value
             val location = _viewModel.reminderSelectedLocationStr.value
-            val latitude = _viewModel.latitude
+            val latitude = _viewModel.latitude.value
             val longitude = _viewModel.longitude.value
-
+            val reminderDataItem = ReminderDataItem(title, description,location, latitude, longitude)
+            Log.d("WWD", "title is " + title)
+            Log.d("WWD", "description is" + description)
+            Log.d("WWD", "location is " + location)
+            Log.d("WWD", "latitude is " + latitude)
+            Log.d("WWD", "longitude is " + longitude)
+            _viewModel.validateAndSaveReminder(reminderDataItem)
+            Log.d("WWD", "called save reminder")
+            _viewModel.navigationCommand.value  = NavigationCommand.Back
 //            TODO: use the user entered reminder details to:
 //             1) add a geofencing request
 //             2) save the reminder to the local db
