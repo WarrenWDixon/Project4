@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.TargetApi
 import android.content.Context
 import android.content.Context.INPUT_METHOD_SERVICE
+import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -16,6 +17,11 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.databinding.DataBindingUtil
+import com.google.android.gms.common.api.ResolvableApiException
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.material.snackbar.Snackbar
 import com.udacity.warrendproject4.R
 import com.udacity.warrendproject4.base.BaseFragment
 import com.udacity.warrendproject4.base.NavigationCommand
@@ -23,6 +29,7 @@ import com.udacity.warrendproject4.databinding.FragmentSaveReminderBinding
 import com.udacity.warrendproject4.locationreminders.reminderslist.ReminderDataItem
 import com.udacity.warrendproject4.utils.setDisplayHomeAsUpEnabled
 import org.koin.android.ext.android.inject
+private const val REQUEST_TURN_DEVICE_LOCATION_ON = 29
 const val REQUEST_BACKGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 35
 class SaveReminderFragment : BaseFragment() {
     //Get the view model this time as a single to be shared with the another fragment
@@ -123,6 +130,43 @@ class SaveReminderFragment : BaseFragment() {
             requestCode
         )
     }
+
+    private fun checkDeviceLocationSettingsAndStartGeofence(resolve:Boolean = true) {
+        val locationRequest = LocationRequest.create().apply {
+            priority = LocationRequest.PRIORITY_LOW_POWER
+        }
+        val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
+        val settingsClient = LocationServices.getSettingsClient(requireActivity())
+        val locationSettingsResponseTask =
+            settingsClient.checkLocationSettings(builder.build())
+        locationSettingsResponseTask.addOnFailureListener { exception ->
+            if (exception is ResolvableApiException && resolve){
+                try {
+                    exception.startResolutionForResult(requireActivity(),
+                        REQUEST_TURN_DEVICE_LOCATION_ON)
+                } catch (sendEx: IntentSender.SendIntentException) {
+                    Log.d("WWD", "Error getting location settings resolution: " + sendEx.message)
+                }
+            } else {
+                Snackbar.make(
+                    binding.fragmentSave,
+                    R.string.location_required_error, Snackbar.LENGTH_INDEFINITE
+                ).setAction(android.R.string.ok) {
+                    checkDeviceLocationSettingsAndStartGeofence()
+                }.show()
+            }
+        }
+        locationSettingsResponseTask.addOnCompleteListener {
+            if ( it.isSuccessful ) {
+                addGeofenceForReminder()
+            }
+        }
+    }
+
+    fun addGeofenceForReminder() {
+        
+    }
+
 
     override fun onDestroy() {
         super.onDestroy()
