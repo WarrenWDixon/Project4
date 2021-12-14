@@ -50,6 +50,7 @@ class SaveReminderFragment : BaseFragment() {
     private lateinit var reminderDataItem: ReminderDataItem
     private lateinit var geofencingClient: GeofencingClient
     private val runningQOrLater = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q
+    private lateinit var contxt: Context
 
     // fragment logic -------------------------------------------------------------------------------
 
@@ -129,6 +130,11 @@ class SaveReminderFragment : BaseFragment() {
         _viewModel.onClear()
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        contxt = context
+    }
+
     // permission logic -------------------------------------------------------------------------------
 
     private fun checkBackgroundLocationPermissionApproved() : Boolean {
@@ -187,11 +193,18 @@ class SaveReminderFragment : BaseFragment() {
     }
 
     private val geofencePendingIntent: PendingIntent by lazy {
-        Log.d("WWD", "in geofencePendingIntent")
-        val intent = Intent(requireActivity(), GeofenceBroadcastReceiver::class.java)
+        //Log.d("WWD", "in geofencePendingIntent")
+        val intent = Intent(contxt, GeofenceBroadcastReceiver::class.java)
         intent.action = ACTION_GEOFENCE_EVENT
-        PendingIntent.getBroadcast(requireActivity(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        PendingIntent.getBroadcast(contxt, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
+
+   /* private val geofencePendingIntent: PendingIntent by lazy {
+        val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
+        // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when calling
+        // addGeofences() and removeGeofences().
+        PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+    } */
 
     private fun checkDeviceLocationSettingsAndStartGeofence(resolve:Boolean = true) {
         Log.d("WWD", "in checkDeviceLocationSettingsAndStartGeofence")
@@ -253,16 +266,27 @@ class SaveReminderFragment : BaseFragment() {
             .build()
         Log.d("WWD", "addGeofenceForReminder built geofenceRequest")
 
+        /* geofencingClient?.addGeofences(geofencingRequest, geofencePendingIntent)?.run {
+            addOnSuccessListener {
+                // Geofences added
+                // ...
+            }
+            addOnFailureListener {
+                // Failed to add geofences
+                // ...
+            }
+        } */
+
        geofencingClient?.addGeofences(geofencingRequest, geofencePendingIntent)?.run {
             addOnSuccessListener {
-                Toast.makeText(requireActivity(), R.string.geofences_added,
+                Toast.makeText(contxt, R.string.geofences_added,
                     Toast.LENGTH_SHORT)
                     .show()
                 Log.d("WWD", "geofence added ")
             }
             addOnFailureListener {
                 Log.d("WWD", "in addGeofenceForReminder failed to add geofence")
-                Toast.makeText(requireActivity(), R.string.geofences_not_added,
+                Toast.makeText(contxt, R.string.geofences_not_added,
                     Toast.LENGTH_SHORT).show()
                 if ((it.message != null)) {
                     Log.w("WWD", it.message!!)
