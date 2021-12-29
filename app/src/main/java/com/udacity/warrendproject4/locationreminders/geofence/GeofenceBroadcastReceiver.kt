@@ -33,7 +33,7 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
             Log.e("WWD", "error in event $errorMessage")
             return
         }
-
+        Log.d("WWD", " ---------- in onReceive -------------")
         // Get the transition type.
         val geofenceTransition = geofencingEvent.geofenceTransition
 
@@ -56,7 +56,12 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
                     return
                 }
             }
-            Log.d("WWD", "fenceId is " + fenceId)
+            Log.d("WWD", "fenceId is $fenceId")
+            var intent  = Intent()
+            intent.putExtra("GEOFENCE_ID", fenceId)
+            GeofenceTransitionsJobIntentService.enqueueWork(context,intent)
+            Log.d("WWD", "called job intent service")
+
         } else {
             // Log the error.
             Log.e("WWD", "error in broadcast receiver");

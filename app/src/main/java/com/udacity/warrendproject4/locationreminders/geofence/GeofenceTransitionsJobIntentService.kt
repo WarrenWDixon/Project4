@@ -2,6 +2,7 @@ package com.udacity.warrendproject4.locationreminders.geofence
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.core.app.JobIntentService
 import com.google.android.gms.location.Geofence
 import com.udacity.warrendproject4.locationreminders.data.dto.ReminderDTO
@@ -24,6 +25,7 @@ class GeofenceTransitionsJobIntentService : JobIntentService(), CoroutineScope {
 
         //        TODO: call this to start the JobIntentService to handle the geofencing transition events
         fun enqueueWork(context: Context, intent: Intent) {
+            Log.d("WWD", "in top level enqueue work")
             enqueueWork(
                 context,
                 GeofenceTransitionsJobIntentService::class.java, JOB_ID,
@@ -36,6 +38,9 @@ class GeofenceTransitionsJobIntentService : JobIntentService(), CoroutineScope {
         //TODO: handle the geofencing transition events and
         // send a notification to the user when he enters the geofence area
         //TODO call @sendNotification
+        Log.d("WWD", "in onHandle work")
+        val geofenceId = intent.getStringExtra("GEOFENCE_ID")
+        Log.d("WWD", "the fence id is $geofenceId")
     }
 
     //TODO: get the request id of the current geofence

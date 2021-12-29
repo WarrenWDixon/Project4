@@ -101,21 +101,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         //         and navigate back to the previous fragment to save the reminder and add the geofence
     }
 
-    private fun setPoiClick(map: GoogleMap) {
-        map.setOnPoiClickListener { poi ->
-            selectedLocation = poi.latLng
-            map.clear()
-            val poiMarker = map.addMarker(
-                MarkerOptions()
-                    .position(poi.latLng)
-                    .title(poi.name)
-            )
-            if (poiMarker != null) {
-                poiMarker.showInfoWindow()
-            }
-            _viewModel.reminderSelectedLocationStr.value = poi.name
-        }
-    }
 
 
 
@@ -144,11 +129,11 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         Log.d("WWD", "in on MapReady")
         map = googleMap
         val zoomLevel = 15f
-        Log.d("WWD", "in on MapReady before setMapLongClick")
         Log.d("WWD", "in on MapReady before enableMyLocation")
         enableMyLocation()
         Log.d("WWD", "now call check DeviceLocation")
         setMapLongClick(map)
+        setPoiClick(map)
     }
     private fun isPermissionGranted() : Boolean {
         return ContextCompat.checkSelfPermission(
@@ -158,12 +143,16 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
     @SuppressLint("MissingPermission")
     private fun enableMyLocation() {
+        Log.d("WWD", "select location enable my location")
         if (isPermissionGranted()) {
+            Log.d("WWD", "select location permission granted")
             map.setMyLocationEnabled(true)
             try {
                 val locationResult = fusedLocationProvider.lastLocation
                 locationResult.addOnCompleteListener(requireActivity()) {
+                    Log.d("WWD", "select location enableMyLocation complete listener")
                     if (it.isSuccessful) {
+                        Log.d("WWD", "select location enableMyLocation complete listener isSuccessful move camera")
                         // Set the map's camera position to the current location of the device.
                         var zoomLocation = it.result
                         var zoomLocationLatLong = LatLng(zoomLocation!!.latitude, zoomLocation.longitude)
@@ -184,8 +173,8 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
 
         }
         else {
-            ActivityCompat.requestPermissions(
-                requireActivity(),
+            Log.d("WWD", "select location permission not granted so request permission")
+            requestPermissions(
                 arrayOf<String>(Manifest.permission.ACCESS_FINE_LOCATION),
                 REQUEST_LOCATION_PERMISSION
             )
@@ -197,10 +186,13 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         permissions: Array<String>,
         grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        Log.d("WWD", "select location onPermissionsResult")
         // Check if location permissions are granted and if so enable the
         // location data layer.
         if (requestCode == REQUEST_LOCATION_PERMISSION) {
+            Log.d("WWD", "select location onPermissionsResult request code good")
             if (grantResults.size > 0 && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                Log.d("WWD", "select location onPermissionsResult permission granted call enableMyLocation")
                 enableMyLocation()
             }
         }
@@ -231,6 +223,27 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             marker?.showInfoWindow()
         }
     }
+
+    private fun setPoiClick(map: GoogleMap) {
+        map.setOnPoiClickListener { poi ->
+            Log.d("WWD", "in setOnPoiClickListener")
+            selectedLocation = poi.latLng
+            map.clear()
+            val poiMarker = map.addMarker(
+                MarkerOptions()
+                    .position(poi.latLng)
+                    .title(poi.name)
+            )
+            if (poiMarker != null) {
+                poiMarker.showInfoWindow()
+            }
+            _viewModel.latitude.value = selectedLocation.latitude
+            _viewModel.longitude.value = selectedLocation.longitude
+            _viewModel.reminderSelectedLocationStr.value = poi.name
+            Log.d("WWD", "in setPoiClick location is " + poi.name)
+        }
+    }
+
 
 
 }

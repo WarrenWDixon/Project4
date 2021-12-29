@@ -62,11 +62,9 @@ class SaveReminderFragment : BaseFragment() {
             DataBindingUtil.inflate(inflater, R.layout.fragment_save_reminder, container, false)
 
         setDisplayHomeAsUpEnabled(true)
-        Log.d("WWD", "in SaveReminderFragment onCreateView")
 
         binding.viewModel = _viewModel
         binding.reminderDescription.onFocusChangeListener = View.OnFocusChangeListener { p0, p1->
-                Log.d("WWD", "in OnFocusChangeListener p0: " + p0 + "  p1: " + p1)
                hideKeyboard()
         }
         geofencingClient = LocationServices.getGeofencingClient(requireActivity())
@@ -75,12 +73,9 @@ class SaveReminderFragment : BaseFragment() {
 
     private fun hideKeyboard() {
         val inputManager = activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        Log.d("WWD", "in hideKeyboard")
         if (inputManager.isAcceptingText) {
-            Log.d("WWD", "in isAcceptingText, call hideSoftInput")
             inputManager.hideSoftInputFromWindow(activity?.currentFocus?.windowToken, 0)
         } else {
-            Log.d("WWD", "isAccepting Text else block")
         }
     }
 
@@ -88,7 +83,6 @@ class SaveReminderFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = this
-        Log.d("WWD", "in SaveReminderFragment onViewCreated")
         binding.selectLocation.setOnClickListener {
             //            Navigate to another fragment to get the user location
             _viewModel.navigationCommand.value =
@@ -158,14 +152,15 @@ class SaveReminderFragment : BaseFragment() {
         val requestCode = REQUEST_BACKGROUND_ONLY_PERMISSIONS_REQUEST_CODE
         Log.d("WWD", "requestBackgroundPermission")
 
-        ActivityCompat.requestPermissions(
-            requireActivity(),
+        requestPermissions(
             permissionsArray,
             requestCode
         )
         Log.d("WWD", "requestBackgroundPermission requested permission")
     }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         Log.d("WWD", "in onRequestPermissionResult")
 
         if (grantResults.isEmpty() || grantResults[0] == PackageManager.PERMISSION_DENIED) {
@@ -198,13 +193,6 @@ class SaveReminderFragment : BaseFragment() {
         intent.action = ACTION_GEOFENCE_EVENT
         PendingIntent.getBroadcast(contxt, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
     }
-
-   /* private val geofencePendingIntent: PendingIntent by lazy {
-        val intent = Intent(this, GeofenceBroadcastReceiver::class.java)
-        // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when calling
-        // addGeofences() and removeGeofences().
-        PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-    } */
 
     private fun checkDeviceLocationSettingsAndStartGeofence(resolve:Boolean = true) {
         Log.d("WWD", "in checkDeviceLocationSettingsAndStartGeofence")
