@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit
 
 const val REQUEST_TURN_DEVICE_LOCATION_ON = 29
 const val REQUEST_BACKGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 35
-const val GEOFENCE_RADIUS_IN_METERS = 100f
+const val GEOFENCE_RADIUS_IN_METERS = 1000f
 val GEOFENCE_EXPIRATION_IN_MILLISECONDS: Long = TimeUnit.HOURS.toMillis(1)
 
 class SaveReminderFragment : BaseFragment() {
