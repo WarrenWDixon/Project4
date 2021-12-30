@@ -21,7 +21,10 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.content.PermissionChecker
+import androidx.core.content.PermissionChecker.checkSelfPermission
 import androidx.databinding.DataBindingUtil
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
@@ -98,14 +101,9 @@ class SaveReminderFragment : BaseFragment() {
             val latitude = _viewModel.latitude.value
             val longitude = _viewModel.longitude.value
             reminderDataItem = ReminderDataItem(title, description,location, latitude, longitude)
-            Log.d("WWD", "title is " + title)
-            Log.d("WWD", "description is" + description)
-            Log.d("WWD", "location is " + location)
-            Log.d("WWD", "latitude is " + latitude)
-            Log.d("WWD", "longitude is " + longitude)
             _viewModel.validateAndSaveReminder(reminderDataItem)
             Log.d("WWD", "called save reminder")
-            _viewModel.navigationCommand.value  = NavigationCommand.Back
+
             if (!checkBackgroundLocationPermissionApproved()){
                 Log.d("WWD", "need background permission")
                  if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q)
@@ -114,7 +112,9 @@ class SaveReminderFragment : BaseFragment() {
             else {
                 Log.d("WWD", "setOnClickListener got permission call checkDeviceLocationSettingsAndStartGeofence")
                 checkDeviceLocationSettingsAndStartGeofence(true)
+                _viewModel.navigationCommand.value  = NavigationCommand.Back
             }
+            Log.d("WWD", "end of saveReminder onClickListener")
         }
     }
 
@@ -131,14 +131,15 @@ class SaveReminderFragment : BaseFragment() {
 
     // permission logic -------------------------------------------------------------------------------
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     private fun checkBackgroundLocationPermissionApproved() : Boolean {
         Log.d("WWD", "in checkBackgroundLocationPermissionApproved")
 
         val backgroundPermissionApproved =
             if (runningQOrLater) {
-                PackageManager.PERMISSION_GRANTED ==
-                        ActivityCompat.checkSelfPermission(
-                            requireActivity(), Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                ContextCompat.checkSelfPermission(
+                    requireActivity(),
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION) === PackageManager.PERMISSION_GRANTED
             } else {
                 true
             }
@@ -178,6 +179,7 @@ class SaveReminderFragment : BaseFragment() {
             checkDeviceLocationSettingsAndStartGeofence()
         }
         Log.d("WWD", "end onRequestPermissionResult")
+        _viewModel.navigationCommand.value  = NavigationCommand.Back
     }
 
     // geofence logic -------------------------------------------------------------------------------
@@ -253,17 +255,6 @@ class SaveReminderFragment : BaseFragment() {
             .addGeofence(geofence)
             .build()
         Log.d("WWD", "addGeofenceForReminder built geofenceRequest")
-
-        /* geofencingClient?.addGeofences(geofencingRequest, geofencePendingIntent)?.run {
-            addOnSuccessListener {
-                // Geofences added
-                // ...
-            }
-            addOnFailureListener {
-                // Failed to add geofences
-                // ...
-            }
-        } */
 
        geofencingClient?.addGeofences(geofencingRequest, geofencePendingIntent)?.run {
             addOnSuccessListener {
