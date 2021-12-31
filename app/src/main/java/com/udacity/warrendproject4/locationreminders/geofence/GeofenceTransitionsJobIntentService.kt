@@ -7,6 +7,8 @@ import androidx.core.app.JobIntentService
 import com.google.android.gms.location.Geofence
 import com.udacity.warrendproject4.locationreminders.data.dto.ReminderDTO
 import com.udacity.warrendproject4.locationreminders.data.dto.Result
+import com.udacity.warrendproject4.locationreminders.data.local.LocalDB
+import com.udacity.warrendproject4.locationreminders.data.local.RemindersDao
 import com.udacity.warrendproject4.locationreminders.data.local.RemindersLocalRepository
 import com.udacity.warrendproject4.locationreminders.reminderslist.ReminderDataItem
 import com.udacity.warrendproject4.utils.sendNotification
@@ -41,10 +43,38 @@ class GeofenceTransitionsJobIntentService : JobIntentService(), CoroutineScope {
         Log.d("WWD", "in onHandle work")
         val geofenceId = intent.getStringExtra("GEOFENCE_ID")
         Log.d("WWD", "the fence id is $geofenceId")
+        val serviceScope = CoroutineScope(Dispatchers.Default)
+        serviceScope.launch {
+            getReminderFromId(geofenceId ?: "")
+        }
+
+
+    }
+
+    suspend fun getReminderFromId(geofenceId: String) {
+        val reminderDao = LocalDB.createRemindersDao(applicationContext)
+        val repository = RemindersLocalRepository(reminderDao)
+        withContext(Dispatchers.IO) {
+            var result = repository.getReminder(geofenceId)
+            if (result is Result.Success<ReminderDTO>) {
+                val reminderDTO = result.data
+                //send a notification to the user with the reminder details
+                sendNotification(
+                    this@GeofenceTransitionsJobIntentService, ReminderDataItem(
+                        reminderDTO.title,
+                        reminderDTO.description,
+                        reminderDTO.location,
+                        reminderDTO.latitude,
+                        reminderDTO.longitude,
+                        reminderDTO.id
+                    )
+                )
+            }
+        }
     }
 
     //TODO: get the request id of the current geofence
-    private fun sendNotification(triggeringGeofences: List<Geofence>) {
+    private fun sendNotification(requestId : String ) {
         val requestId = ""
 
         //Get the local repository instance
