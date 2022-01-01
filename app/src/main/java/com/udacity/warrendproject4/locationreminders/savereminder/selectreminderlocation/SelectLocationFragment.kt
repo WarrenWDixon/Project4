@@ -73,7 +73,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             _viewModel.navigationCommand.value  = NavigationCommand.Back
         }
 
-
         setHasOptionsMenu(true)
         setDisplayHomeAsUpEnabled(true)
 
@@ -101,25 +100,26 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         //         and navigate back to the previous fragment to save the reminder and add the geofence
     }
 
-
-
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.map_options, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        // TODO: Change the map type based on the user's selection.
+        // Change the map type based on the user's selection.
         R.id.normal_map -> {
+            map.mapType = GoogleMap.MAP_TYPE_NORMAL
             true
         }
         R.id.hybrid_map -> {
+            map.mapType = GoogleMap.MAP_TYPE_HYBRID
             true
         }
         R.id.satellite_map -> {
+            map.mapType = GoogleMap.MAP_TYPE_SATELLITE
             true
         }
         R.id.terrain_map -> {
+            map.mapType = GoogleMap.MAP_TYPE_TERRAIN
             true
         }
         else -> super.onOptionsItemSelected(item)
@@ -133,7 +133,27 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         enableMyLocation()
         Log.d("WWD", "now call check DeviceLocation")
         setMapLongClick(map)
+        setMapStyle(map)
         setPoiClick(map)
+    }
+
+    private fun setMapStyle(map: GoogleMap) {
+        try {
+            // Customize the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            val success = map.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(
+                    requireActivity(),
+                    R.raw.map_style
+                )
+            )
+
+            if (!success) {
+                Log.e("WWD", "Style parsing failed.")
+            }
+        } catch (e: Resources.NotFoundException) {
+            Log.e("WWD", "Can't find style. Error: ", e)
+        }
     }
     private fun isPermissionGranted() : Boolean {
         return ContextCompat.checkSelfPermission(
